@@ -1,13 +1,18 @@
 package lcq.com.androidtest;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,VoiceActivity.class));
             }
         });
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            this.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                    111);
+        }
     }
 
     public void openAnimation() {
@@ -150,9 +161,12 @@ public class MainActivity extends AppCompatActivity {
             audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, playBufSize, AudioTrack.MODE_STREAM);
             audioTrack.play();
             try {
-                inputStream = MainActivity.this.getAssets().open("myvoice.pcm");
+                inputStream = MainActivity.this.getAssets().open("test.pcm");
+                int count = 0;
                 while (inputStream.read(b)!=-1&&isPlaying){
                     audioTrack.write(b,0,b.length);
+                    count++;
+                    Log.e("test",count+"");
                 }
                 inputStream.close();
             } catch (IOException e) {
