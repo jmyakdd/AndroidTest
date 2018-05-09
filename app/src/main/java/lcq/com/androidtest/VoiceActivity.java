@@ -89,6 +89,9 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             for (byte[] b : data) {
                 audioTrack.write(b, 0, b.length);
             }
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack = null;
         }
     }
 
