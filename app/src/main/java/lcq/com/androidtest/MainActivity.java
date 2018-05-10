@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private InputStream inputStream = null;
     private byte[] b = new byte[1024];
 
+    private String[] permission = new String[]{Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -130,9 +134,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            this.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
-                    111);
+        MyHelloJni helloJni = new MyHelloJni();
+        for(String p:permission) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+                this.requestPermissions(permission, 111);
+                return;
+            }
         }
     }
 

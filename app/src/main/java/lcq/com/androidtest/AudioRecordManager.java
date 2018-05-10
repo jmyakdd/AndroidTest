@@ -1,13 +1,12 @@
 package lcq.com.androidtest;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -16,26 +15,21 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 
 public class AudioRecordManager {
-    public static final int WHAT_START_RECORD = 0;
-    public static final int WHAT_COMPLETE_RECORD = 1;
     private final int m_buff_size = 1024;
     private AudioRecord audioRecord;
     private byte[] buff = new byte[m_buff_size];
-    private List<byte[]>data = new ArrayList<>();
 
     private Handler handler;
 
     private ScheduledExecutorService scheduledExecutorService;
     private boolean isRecord = false;
+    private FileStorage storage;
 
-    public AudioRecordManager(Handler handler) {
+    public AudioRecordManager(Handler handler, Context context) {
         this.handler = handler;
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        storage = new FileStorage(context);
         init();
-    }
-
-    public List<byte[]> getData() {
-        return data;
     }
 
     private void init() {
@@ -56,6 +50,8 @@ public class AudioRecordManager {
     }
 
     public void startRecord() {
+        init();
+        storage.startStorage();
         scheduledExecutorService.execute(new RecordThread());
     }
 
@@ -64,6 +60,7 @@ public class AudioRecordManager {
     }
 
     public void stopRecord() {
+        storage.closeStorage();
         if (audioRecord == null) {
             return;
         }
@@ -105,7 +102,7 @@ public class AudioRecordManager {
             while (isRecord) {
                 count++;
                 audioRecord.read(buff, 0, m_buff_size);
-                data.add(buff);
+                storage.writeData(buff);
                 log(count + " " + buff.length);
             }
         }

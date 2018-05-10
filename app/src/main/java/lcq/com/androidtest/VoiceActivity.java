@@ -12,6 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class VoiceActivity extends AppCompatActivity implements View.OnClickListener {
@@ -34,7 +39,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_voice);
 
         bindView();
-        audioRecordManager = new AudioRecordManager(handler);
+        audioRecordManager = new AudioRecordManager(handler,getApplicationContext());
     }
 
     private void bindView() {
@@ -85,9 +90,19 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             int playBufSize = AudioTrack.getMinBufferSize(frequency, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
             audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, playBufSize, AudioTrack.MODE_STREAM);
             audioTrack.play();
-            int count = 0;
-            for (byte[] b : data) {
-                audioTrack.write(b, 0, b.length);
+            InputStream inputStream;
+            File file = new File(FileStorage.filePath+"test1.pcm");
+            byte[] b = new byte[1024];
+            try {
+                inputStream = new FileInputStream(file);
+                while (inputStream.read(b) > 0) {
+                    audioTrack.write(b, 0, b.length);
+                }
+                inputStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             audioTrack.stop();
             audioTrack.release();
