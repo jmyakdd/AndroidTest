@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 public class VoiceActivity extends AppCompatActivity implements View.OnClickListener {
     private Button btn, play;
@@ -75,15 +74,10 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void playVoice() {
-        new Thread(new MyThread(audioRecordManager.getData())).start();
+        new Thread(new MyThread()).start();
     }
 
     class MyThread implements Runnable {
-        List<byte[]> data;
-
-        MyThread(List<byte[]> data) {
-            this.data = data;
-        }
 
         @Override
         public void run() {
