@@ -5,7 +5,19 @@ package lcq.com.androidtest;
  */
 
 public class MyHelloJni {
+    public String getHello(){
+        return hello();
+    }
+
+    public String getHello1(String str){
+        return hello(str);
+    }
+
     public native String hello();
 
     public native String hello(String string);
+
+    static {
+        System.loadLibrary("MyHelloJni");
+    }
 }

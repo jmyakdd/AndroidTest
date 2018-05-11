@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class VoiceActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button btn, play;
+    private Button btn, play, copy;
 
     private AudioRecordManager audioRecordManager;
     private AudioTrack audioTrack;
@@ -44,6 +44,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     private void bindView() {
         btn = findViewById(R.id.btn);
         play = findViewById(R.id.play);
+        copy = findViewById(R.id.copy);
 
         btn.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -62,6 +63,8 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             }
         });
         play.setOnClickListener(this);
+
+        copy.setOnClickListener(this);
     }
 
     @Override
@@ -70,7 +73,37 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             case R.id.play:
                 playVoice();
                 break;
+            case R.id.copy:
+                copy();
+                break;
         }
+    }
+
+    private FileStorage storage;
+    private InputStream inputStream;
+    private byte[] b = new byte[960];
+    private byte[]bOut = new byte[960];
+
+    private void copy() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                storage = new FileStorage(VoiceActivity.this);
+                storage.startStorage();
+                agcTest a = new agcTest();
+                try {
+                    inputStream = VoiceActivity.this.getAssets().open("test.pcm");
+                    while (inputStream.read(b)!=-1){
+                        a.agcFrame(b,b.length,bOut);
+                        storage.writeData(bOut);
+                    }
+                    inputStream.close();
+                    storage.closeStorage();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void playVoice() {

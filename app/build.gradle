@@ -9,6 +9,15 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            moduleName "MyHelloJni"
+            abiFilters "armeabi", "armeabi-v7a"
+        }
+
+        sourceSets.main {
+            jniLibs.srcDirs = ["libs"]
+        }
     }
     buildTypes {
         release {
@@ -16,6 +25,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
 }
 
 dependencies {
