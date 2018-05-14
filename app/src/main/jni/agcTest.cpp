@@ -12,8 +12,8 @@
 #include "noise_suppression.h"
 #include "gain_control.h"
 #include "lcq_com_androidtest_agcTest.h"
-int agcFrame(unsigned char *pIn, int len, unsigned char *pOut);
-int initAgcMod();
+/*int agcFrame(unsigned char *pIn, int len, unsigned char *pOut);
+int initAgcMod();*/
 
 void *AgcHandle = NULL;
 /*
@@ -81,12 +81,11 @@ JNIEXPORT jint JNICALL Java_lcq_com_androidtest_agcTest_initAgcMod
 }
 
 JNIEXPORT jint JNICALL Java_lcq_com_androidtest_agcTest_agcFrame
-  (JNIEnv *env, jobject, jbyteArray in, jint l, jbyteArray out)
+  (JNIEnv *env, jobject job, jshortArray in, jint l, jshortArray out)
 //int agcFrame(unsigned char *pIn, int len, unsigned char *pOut)
 {
-
-    jbyte* bBuffer = env->GetByteArrayElements(in,0);
-    jbyte* bBuffer1 = env->GetByteArrayElements(out,0);
+    jshort* bBuffer = env->GetShortArrayElements(in,0);
+    jshort* bBuffer1 = env->GetShortArrayElements(out,0);
     unsigned char *pIn = (unsigned char*)bBuffer;
     int len = l;
     unsigned char *pOut = (unsigned char*)bBuffer1;
@@ -121,6 +120,8 @@ JNIEXPORT jint JNICALL Java_lcq_com_androidtest_agcTest_agcFrame
 			break;
 	}
 	memcpy(pOut,(char*)outBuf, len);
+	env->ReleaseShortArrayElements(in,bBuffer,0);
+	env->ReleaseShortArrayElements(out,bBuffer1,0);
 	return 0;
 }
 
