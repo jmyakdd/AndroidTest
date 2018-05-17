@@ -21,7 +21,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
@@ -140,10 +139,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,Main2Activity.class));
             }
         });
-
-        MyHelloJni helloJni = new MyHelloJni();
-        Toast.makeText(this,helloJni.getHello(),Toast.LENGTH_SHORT).show();
-        Toast.makeText(this,helloJni.getHello1("sssss"),Toast.LENGTH_SHORT).show();
 
         for(String p:permission) {
             if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {

@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL Java_lcq_com_androidtest_agcTest_initAgcMod
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     lcq_com_androidtest_agcTest

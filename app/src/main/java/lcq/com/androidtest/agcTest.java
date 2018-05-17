@@ -6,7 +6,7 @@ package lcq.com.androidtest;
 
 public class agcTest {
 
-    public native int initAgcMod();
+    public native int initAgcMod(int level);
 
     public native int agcFrame(short[] in, int length, short[] out);
 
