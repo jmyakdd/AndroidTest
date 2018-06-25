@@ -1,7 +1,10 @@
 package lcq.com.androidtest;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioFormat;
@@ -30,12 +33,12 @@ import java.io.InputStream;
 import lcq.com.androidtest.bean.User;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText name,age;
+    private EditText name, age;
     private RadioGroup sexGroup;
-    private RadioButton male,female;
-    private Button submit,query,start,stop,record;
+    private RadioButton male, female;
+    private Button submit, query, start, stop, record;
     private String sex = "male";
-    private ImageView callingAnimation,callingAnimationBg;
+    private ImageView callingAnimation, callingAnimationBg;
     private AnimationDrawable animationDrawable;
 
     private AudioTrack audioTrack;
@@ -47,11 +50,18 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             closeAnimation();
+        }
+    };
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e("test", "收到校闻app广播消息");
         }
     };
 
@@ -91,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 User user = DataSupport.findFirst(User.class);
-                Log.e("test",user.toString());
+                Log.e("test", user.toString());
             }
         });
 
         sexGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i){
+                switch (i) {
                     case R.id.male:
                         sex = "male";
                         break;
@@ -112,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isPlaying){
+                if (isPlaying) {
                     return;
                 }
                 openAnimation();
@@ -130,22 +140,38 @@ public class MainActivity extends AppCompatActivity {
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,VoiceActivity.class));
+                startActivity(new Intent(MainActivity.this, VoiceActivity.class));
             }
         });
         findViewById(R.id.testList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,Main2Activity.class));
+                startActivity(new Intent(MainActivity.this, Main2Activity.class));
             }
         });
 
-        for(String p:permission) {
+        initBroadcastReceiver();
+
+        for (String p : permission) {
             if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(permission, 111);
                 return;
             }
         }
+    }
+
+    private final String actionPublic = "com.public.action.refresh";
+
+    private void initBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(actionPublic);
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     public void openAnimation() {
@@ -155,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeAnimation() {
         callingAnimation.setVisibility(View.GONE);
-        if(audioTrack==null){
+        if (audioTrack == null) {
             return;
         }
         isPlaying = false;
@@ -163,9 +189,10 @@ public class MainActivity extends AppCompatActivity {
         audioTrack.release();
         audioTrack = null;
     }
+
     private boolean isPlaying = false;
 
-    class MyThread implements Runnable{
+    class MyThread implements Runnable {
 
         @Override
         public void run() {
@@ -175,15 +202,15 @@ public class MainActivity extends AppCompatActivity {
             try {
                 inputStream = MainActivity.this.getAssets().open("test.pcm");
                 int count = 0;
-                while (inputStream.read(b)!=-1&&isPlaying){
-                    audioTrack.write(b,0,b.length);
+                while (inputStream.read(b) != -1 && isPlaying) {
+                    audioTrack.write(b, 0, b.length);
                     count++;
-                    Log.e("test",count+"");
+                    Log.e("test", count + "");
                 }
                 inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 handler.sendEmptyMessage(0);
             }
         }

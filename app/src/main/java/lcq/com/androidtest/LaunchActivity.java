@@ -14,7 +14,7 @@ public class LaunchActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            startActivity(new Intent(LaunchActivity.this,MainActivity.class));
+            startActivity(new Intent(LaunchActivity.this, Main1Activity.class));
         }
     };
 
