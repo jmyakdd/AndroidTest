@@ -1,14 +1,21 @@
 package lcq.com.androidtest;
 
+import android.media.AmrInputStream;
+import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 
 public class MixVoiceUtil {
-
+    /**
+     * 噪音太大
+     * @param data1
+     * @param data2
+     * @return
+     */
     public static byte[] mixVoice(byte[] data1, byte[] data2) {
         int length1 = data1.length;
         int length2 = data2.length;
@@ -16,29 +23,13 @@ public class MixVoiceUtil {
         int size = length1 >= length2 ? length1 : length2;
         byte[] data = new byte[size];
         int i = 0;
-        double f = 1;
         for (; i < count; i++) {
 //            data[i] = (byte) (data1[i]+data2[i]-(data1[i]*data2[i]>>0x10));
-            /*if (data1[i] < 0 && data2[i] < 0) {
+            if (data1[i] < 0 && data2[i] < 0) {
                 data[i] = (byte) (data1[i] + data2[i] - (data1[i] * data2[i] / -(Math.pow(2, 16 - 1) - 1)));
             } else {
                 data[i] = (byte) (data1[i] + data2[i] - (data1[i] * data2[i] / (Math.pow(2, 16 - 1) - 1)));
-            }*/
-            int d = data1[i] + data2[i] + count * 2;
-            d = (int) (d * f);
-            if (d > 32767) {
-                f = 32767d / d;
-                d = 32767;
             }
-            if (d < -32768) {
-                f = -32767d / d;
-                d = -32768;
-            }
-            if (f < 1) {
-                f += ((double) 1 - f) / (double) 32;
-            }
-            data[i] = (byte) d;
-//            data[i]= (byte) ((data1[i]+data2[i])/2);
         }
         if (i == length1) {
             for (int j = i; j < length2; j++) {
@@ -52,70 +43,8 @@ public class MixVoiceUtil {
         return data;
     }
 
-    public static void mixAudios(File[] rawAudioFiles) {
-
-        final int fileSize = rawAudioFiles.length;
-
-        FileInputStream[] audioFileStreams = new FileInputStream[fileSize];
-        File audioFile = null;
-
-        FileInputStream inputStream;
-        byte[][] allAudioBytes = new byte[fileSize][];
-        boolean[] streamDoneArray = new boolean[fileSize];
-        byte[] buffer = new byte[512];
-        int offset;
-
-        try {
-
-            for (int fileIndex = 0; fileIndex < fileSize; ++fileIndex) {
-                audioFile = rawAudioFiles[fileIndex];
-                audioFileStreams[fileIndex] = new FileInputStream(audioFile);
-            }
-
-            while (true) {
-
-                for (int streamIndex = 0; streamIndex < fileSize; ++streamIndex) {
-
-                    inputStream = audioFileStreams[streamIndex];
-                    if (!streamDoneArray[streamIndex] && (offset = inputStream.read(buffer)) != -1) {
-                        allAudioBytes[streamIndex] = Arrays.copyOf(buffer, buffer.length);
-                    } else {
-                        streamDoneArray[streamIndex] = true;
-                        allAudioBytes[streamIndex] = new byte[512];
-                    }
-                }
-
-                byte[] mixBytes = averageMix(allAudioBytes);
-
-                //mixBytes 就是混合后的数据
-
-                boolean done = true;
-                for (boolean streamEnd : streamDoneArray) {
-                    if (!streamEnd) {
-                        done = false;
-                    }
-                }
-
-                if (done) {
-                    break;
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                for (FileInputStream in : audioFileStreams) {
-                    if (in != null)
-                        in.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
+     * 较好
      * 每一行是一个音频的数据
      */
     public static byte[] averageMix(byte[][] bMulRoadAudioes) {
@@ -166,6 +95,7 @@ public class MixVoiceUtil {
     }
 
     /**
+     * 较好
      * 归一化混音
      */
     public static byte[] normalizationMix(byte[][] allAudioBytes) {
@@ -236,6 +166,11 @@ public class MixVoiceUtil {
         return dest;
     }
 
+    /**
+     * 较好
+     * @param bMulRoadAudioes
+     * @return
+     */
     public static byte[] mixRawAudioBytes(byte[][] bMulRoadAudioes) {
 
         if (bMulRoadAudioes == null || bMulRoadAudioes.length == 0)
@@ -282,5 +217,34 @@ public class MixVoiceUtil {
         }
 
         return realMixAudio;
+    }
+
+    public static void pcm2amr(InputStream inputStream) {
+        AmrInputStream ais = new AmrInputStream(inputStream);
+        try {
+            FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + "/test.amr");
+            byte[] buf = new byte[4096];
+            int len = -1;
+            /*
+             * 下面的amr的文件头
+             * 缺少这几个字节是不行的
+             */
+            out.write(0x23);
+            out.write(0x21);
+            out.write(0x41);
+            out.write(0x4D);
+            out.write(0x52);
+            out.write(0x0A);
+            while((len = ais.read(buf)) >0){
+                out.write(buf,0,len);
+            }
+            out.close();
+            ais.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
