@@ -10,10 +10,6 @@
         android:id="@+id/play1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="播放1"
         app:layout_constraintBottom_toTopOf="@+id/play2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,13 +23,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:text="播放2"
         app:layout_constraintBottom_toTopOf="@+id/play3"
         app:layout_constraintEnd_toEndOf="@id/play1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play1" />
 
     <Button
         android:id="@+id/play3"
@@ -46,7 +41,8 @@
         app:layout_constraintBottom_toTopOf="@+id/play4"
         app:layout_constraintEnd_toEndOf="@id/play1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play2" />
 
     <Button
         android:id="@+id/play4"
@@ -59,7 +55,8 @@
         app:layout_constraintBottom_toTopOf="@+id/play5"
         app:layout_constraintEnd_toEndOf="@id/play1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play3" />
 
     <Button
         android:id="@+id/play5"
@@ -72,7 +69,8 @@
         app:layout_constraintBottom_toTopOf="@+id/play6"
         app:layout_constraintEnd_toEndOf="@id/play1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play4" />
 
     <Button
         android:id="@+id/play6"
@@ -85,6 +83,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/play1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play5" />
 
 </android.support.constraint.ConstraintLayout>
